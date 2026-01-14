@@ -1,3 +1,4 @@
+<button id="darkModeToggle">🌙 Toggle Dark Mode</button>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -6,6 +7,20 @@
 <title>Copart Total Cost Calculator</title>
 
 <style>
+  <style>
+  body.dark-mode {
+    background-color: #121212;
+    color: #f0f0f0;
+  }
+
+  .dark-mode input,
+  .dark-mode select,
+  .dark-mode button {
+    background-color: #1e1e1e;
+    color: #f0f0f0;
+    border: 1px solid #444;
+  }
+</style>
   body {
     font-family: Arial, sans-serif;
     background: #f5f5f5;
@@ -186,7 +201,12 @@ const totalSpan = document.getElementById("total");
 const maxBidSpan = document.getElementById("maxBid");
 const overWarning = document.getElementById("overWarning");
 </script>
-
+<script>
+  const toggle = document.getElementById('darkModeToggle');
+  toggle.addEventListener('click', () => {
+    document.body.classList.toggle('dark-mode');
+  });
+</script>
 </body>
 </html>
  <!-- Triggering redeploy -->
