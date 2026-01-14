@@ -56,9 +56,22 @@
       font-weight: bold;
     }
 
-    #colorPanel {
+    #colorToggle {
       position: absolute;
       top: 20px;
+      left: 20px;
+      background: #444;
+      color: #fff;
+      padding: 8px 12px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 14px;
+      z-index: 1001;
+    }
+
+    #colorPanel {
+      position: absolute;
+      top: 60px;
       left: 20px;
       background: #eee;
       padding: 10px;
@@ -66,6 +79,17 @@
       box-shadow: 0 0 5px rgba(0,0,0,0.2);
       font-size: 14px;
       z-index: 1000;
+      transition: max-height 0.3s ease, opacity 0.3s ease;
+      overflow: hidden;
+      max-height: 200px;
+      opacity: 1;
+    }
+
+    #colorPanel.collapsed {
+      max-height: 0;
+      opacity: 0;
+      padding: 0 10px;
+      pointer-events: none;
     }
 
     #colorPanel label {
@@ -82,7 +106,8 @@
 </head>
 <body>
 
-  <div id="colorPanel">
+  <div id="colorToggle">🎨 Color Settings</div>
+  <div id="colorPanel" class="collapsed">
     <label>Background: <input type="color" id="bgColor" /></label>
     <label>Text: <input type="color" id="textColor" /></label>
     <label>Border: <input type="color" id="borderColor" /></label>
@@ -179,7 +204,14 @@
       budgetInput.addEventListener('input', calculateFees);
 
       calculateFees();
-      // Color customization
+      // Color customization toggle
+      const colorToggle = document.getElementById('colorToggle');
+      const colorPanel = document.getElementById('colorPanel');
+
+      colorToggle.addEventListener('click', () => {
+        colorPanel.classList.toggle('collapsed');
+      });
+
       const bgColorInput = document.getElementById('bgColor');
       const textColorInput = document.getElementById('textColor');
       const borderColorInput = document.getElementById('borderColor');
