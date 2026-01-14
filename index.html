@@ -1,148 +1,191 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Copart Bid Calculator</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      background: #f5f5f5;
-      color: #000;
-      padding: 20px;
-      transition: background 0.3s, color 0.3s;
-    }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Copart Total Cost Calculator</title>
 
-    .dark-mode {
-      background: #000;
-      color: #fff;
-    }
-
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    background: #f5f5f5;
+    padding: 20px;
+  }
+  .container {
+    max-width: 900px;
+    margin: auto;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+  }
+  .box {
+    background: #fff;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+  }
+  h2 {
+    margin-top: 0;
+  }
+  label {
+    display: block;
+    margin-top: 10px;
+    font-weight: bold;
+  }
+  input {
+    width: 100%;
+    padding: 8px;
+    margin-top: 5px;
+  }
+  .result {
+    margin-top: 15px;
+    font-size: 18px;
+    font-weight: bold;
+  }
+  .warning {
+    color: red;
+    font-weight: bold;
+  }
+  @media (max-width: 768px) {
     .container {
-      max-width: 900px;
-      margin: auto;
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 20px;
+      grid-template-columns: 1fr;
     }
-
-    .box {
-      background: #fff;
-      padding: 20px;
-      border-radius: 10px;
-      box-shadow: 0 0 10px rgba(0,0,0,0.1);
-      transition: background 0.3s, color 0.3s;
-    }
-
-    .dark-mode .box {
-      background: #1a1a1a;
-      color: #fff;
-      box-shadow: 0 0 10px rgba(255,255,255,0.05);
-    }
-
-    h2 {
-      margin-top: 0;
-    }
-
-    label {
-      display: block;
-      margin-top: 10px;
-      font-weight: bold;
-    }
-
-    input {
-      width: 100%;
-      padding: 8px;
-      margin-top: 5px;
-    }
-
-    .dark-mode input {
-      background-color: #333;
-      color: #fff;
-      border: 1px solid #555;
-    }
-
-    .result {
-      margin-top: 15px;
-      font-size: 18px;
-      font-weight: bold;
-    }
-
-    .warning {
-      color: red;
-      font-weight: bold;
-    }
-
-    #darkModeToggle {
-      position: absolute;
-      top: 20px;
-      left: 20px;
-      padding: 8px 16px;
-      background-color: #444;
-      color: #fff;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
-    }
-
-    @media (max-width: 768px) {
-      .container {
-        grid-template-columns: 1fr;
-      }
-    }
-  </style>
+  }
+</style>
 </head>
+
 <body>
-  <button id="darkModeToggle">Dark Mode</button>
 
-  <div class="container">
-    <div class="box">
-      <h2>Current Bid Calculator</h2>
-      <label for="bid">Current Bid ($)</label>
-      <input type="number" id="bid" />
+<div class="container">
 
-      <label for="shipping">Shipping ($)</label>
-      <input type="number" id="shipping" value="0" />
+  <!-- CURRENT BID CALCULATOR -->
+  <div class="box">
+    <h2>Current Bid Calculator</h2>
 
-      <p>Title Fee ($): 50</p>
-      <p>Gate Fee ($): 79</p>
-      <p>Internet Bid Fee ($): 79</p>
-      <p>Environmental Fee ($): 10</p>
+    <label>Current Bid ($)</label>
+    <input type="number" id="bid" oninput="calculate()">
 
-      <p class="result">Buyer Fee: $<span id="buyerFee">0</span></p>
-      <p class="result">Total Cost: $<span id="totalCost">0</span></p>
-    </div>
+    <label>Shipping ($)</label>
+    <input type="number" id="shipping" value="0" oninput="calculate()">
 
-    <div class="box">
-      <h2>Max Bid Safety</h2>
-      <label for="budget">Total Budget ($)</label>
-      <input type="number" id="budget" />
+    <label>Title Fee ($)</label>
+    <input type="number" id="title" value="50" oninput="calculate()">
 
-      <p class="result">Max Safe Bid: $<span id="maxSafeBid">0</span></p>
-    </div>
+    <label>Gate Fee ($)</label>
+    <input type="number" id="gate" value="79" oninput="calculate()">
+
+    <label>Internet Bid Fee ($)</label>
+    <input type="number" id="internet" value="79" oninput="calculate()">
+
+    <label>Environmental Fee ($)</label>
+    <input type="number" id="env" value="10" oninput="calculate()">
+
+    <div class="result">Buyer Fee: $<span id="buyerFee">0</span></div>
+    <div class="result">Total Cost: $<span id="total">0</span></div>
   </div>
 
-  <script>
-    const bidInput = document.getElementById('bid');
-    const shippingInput = document.getElementById('shipping');
-    const budgetInput = document.getElementById('budget');
-    const buyerFeeDisplay = document.getElementById('buyerFee');
-    const totalCostDisplay = document.getElementById('totalCost');
-    const maxSafeBidDisplay = document.getElementById('maxSafeBid');
+  <!-- MAX BID SAFETY -->
+  <div class="box">
+    <h2>Max Bid Safety</h2>
 
-    function calculateFees() {
-      const bid = parseFloat(bidInput.value) || 0;
-      const shipping = parseFloat(shippingInput.value) || 0;
-      const titleFee = 50;
-      const gateFee = 79;
-      const internetFee = 79;
-      const envFee = 10;
+    <label>Total Budget ($)</label>
+    <input type="number" id="budget" oninput="calculate()">
 
-      const buyerFee = Math.round(bid * 0.1); // Example: 10% buyer fee
-      const totalCost = bid + buyerFee + shipping + titleFee + gateFee + internetFee + envFee;
+    <div class="result">Max Safe Bid: $<span id="maxBid">0</span></div>
+    <div id="overWarning" class="warning"></div>
+  </div>
 
-      buyerFeeDisplay.textContent = buyerFee;
-      totalCostDisplay.textContent = totalCost;
+</div>
 
-      const budget = parseFloat(budgetInput.value) || 0;
-      const maxSafeBid = budget - (buyerFee + shipping + titleFee + gateFee + internetFee + envFee);
+<script>
+function getBuyerFee(bid) {
+  if (bid < 50) return 25;
+  if (bid < 100) return 45;
+  if (bid < 200) return 80;
+  if (bid < 300) return 120;
+  if (bid < 350) return 120;
+  if (bid < 400) return 120;
+  if (bid < 450) return 160;
+  if (bid < 500) return 160;
+  if (bid < 550) return 185;
+  if (bid < 600) return 185;
+  if (bid < 700) return 210;
+  if (bid < 800) return 230;
+  if (bid < 900) return 250;
+  if (bid < 1000) return 275;
+  if (bid < 1200) return 325;
+  if (bid < 1300) return 350;
+  if (bid < 1400) return 365;
+  if (bid < 1500) return 380;
+  if (bid < 1600) return 390;
+  if (bid < 1700) return 410;
+  if (bid < 1800) return 420;
+  if (bid < 2000) return 440;
+  if (bid < 2400) return 470;
+  if (bid < 2500) return 480;
+  if (bid < 3000) return 500;
+  if (bid < 3500) return 600;
+  if (bid < 4000) return 675;
+  if (bid < 4500) return 710;
+  if (bid < 5000) return 750;
+  if (bid < 6000) return 750;
+  if (bid < 7000) return 800;
+  if (bid < 7500) return 800;
+  if (bid < 8000) return 815;
+  if (bid < 8500) return 840;
+  if (bid < 9000) return 840;
+  if (bid < 10000) return 840;
+  if (bid < 15000) return 850;
+  return bid * 0.0725;
+}
+
+function calculate() {
+  const bid = Number(bidInput.value);
+  const shipping = Number(shippingInput.value);
+  const title = Number(titleInput.value);
+  const gate = Number(gateInput.value);
+  const internet = Number(internetInput.value);
+  const env = Number(envInput.value);
+  const budget = Number(budgetInput.value);
+
+  const fixedFees = shipping + title + gate + internet + env;
+  const buyerFee = bid > 0 ? getBuyerFee(bid) : 0;
+  const total = bid + buyerFee + fixedFees;
+
+  buyerFeeSpan.textContent = buyerFee.toFixed(2);
+  totalSpan.textContent = total.toFixed(2);
+
+  let maxBid = 0;
+  if (budget > 0) {
+    for (let test = 0; test <= budget; test += 5) {
+      if (test + getBuyerFee(test) + fixedFees <= budget) {
+        maxBid = test;
+      } else break;
+    }
+  }
+
+  maxBidSpan.textContent = maxBid.toFixed(0);
+
+  overWarning.textContent =
+    bid > maxBid && budget > 0
+      ? "⚠️ Current bid exceeds your safe max!"
+      : "";
+}
+
+// element shortcuts
+const bidInput = document.getElementById("bid");
+const shippingInput = document.getElementById("shipping");
+const titleInput = document.getElementById("title");
+const gateInput = document.getElementById("gate");
+const internetInput = document.getElementById("internet");
+const envInput = document.getElementById("env");
+const budgetInput = document.getElementById("budget");
+
+const buyerFeeSpan = document.getElementById("buyerFee");
+const totalSpan = document.getElementById("total");
+const maxBidSpan = document.getElementById("maxBid");
+const overWarning = document.getElementById("overWarning");
+</script>
+
+</body>
+</html>
